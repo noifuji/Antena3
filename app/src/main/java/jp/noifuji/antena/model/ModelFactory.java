@@ -9,6 +9,7 @@ public class ModelFactory {
 
     private static ModelFactory instance = new ModelFactory();
     private HeadLineListModel mHeadLineListModel;
+    private EntryModel mEntryModel;
     private ModelFactory(){}
 
     public static  ModelFactory getInstance() {
@@ -20,5 +21,12 @@ public class ModelFactory {
             mHeadLineListModel = new HeadLineListModel(context);
         }
         return mHeadLineListModel;
+    }
+
+    public EntryModel getmEntryModel() {
+        if(mEntryModel == null) {
+            mEntryModel = new EntryModel();
+        }
+        return mEntryModel;
     }
 }

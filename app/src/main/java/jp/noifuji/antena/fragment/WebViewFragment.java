@@ -13,6 +13,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import jp.noifuji.antena.R;
+import jp.noifuji.antena.model.EntryModel;
+import jp.noifuji.antena.model.ModelFactory;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -20,16 +22,23 @@ import jp.noifuji.antena.R;
  * {@link WebViewFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  */
-public class WebViewFragment extends Fragment {
+public class WebViewFragment extends Fragment implements EntryModel.EntryModelListener{
     private static final String TAG = "WebViewFragment";
     private WebView webView;
     private View mProgressBar;
     private OnFragmentInteractionListener mListener;
+    private EntryModel mEntryModel;
 
     public WebViewFragment() {
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mEntryModel = ModelFactory.getInstance().getmEntryModel();
+        mEntryModel.addListener(this);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -58,15 +67,17 @@ public class WebViewFragment extends Fragment {
         });
 
         Intent intent = this.getActivity().getIntent();
-        if (intent.hasExtra("URI")) {
+/*        if (intent.hasExtra("URI")) {
             String uri = intent.getStringExtra("URI");
             webView.loadUrl(uri);
         } else if (intent.hasExtra("HTML")) {
             String html = intent.getStringExtra("HTML");
             webView.loadData(html, "text/html; charset=utf-8", "UTF-8");
-        }
+        }*/
 
         mListener.registerWebView(webView);
+
+        mEntryModel.loadEntry(this.getActivity(), getLoaderManager(), intent.getStringExtra("URI"));
 
         return view;
     }
@@ -87,7 +98,19 @@ public class WebViewFragment extends Fragment {
         //Activityに渡していたWevViewへの参照を消しておく。
         mListener.registerWebView(null);
         mListener = null;
+        mEntryModel.removeListener(this);
         super.onDetach();
+    }
+
+    @Override
+    public void onLoadEntryError(String errorMessage) {
+        mProgressBar.setVisibility(View.GONE);
+        mListener.onShowTextMessage(errorMessage);
+    }
+
+    @Override
+    public void onEntryLoaded(String html) {
+        webView.loadData(html, "text/html; charset=utf-8", "UTF-8");
     }
 
     /**
@@ -104,6 +127,7 @@ public class WebViewFragment extends Fragment {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
         public void registerWebView(WebView webview);
+        void onShowTextMessage(String message);
     }
 
 }

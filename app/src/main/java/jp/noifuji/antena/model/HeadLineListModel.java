@@ -29,7 +29,7 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
     private static final int ENTRY_LIST_LIMIT = 100;
     private Loader mLoader;
     private Context mContext;
-    private HeadLineListModelListener mListner;
+    private HeadLineListModelListener mListener;
 
     private List<HeadLine> mHeadLineList;
 
@@ -95,9 +95,7 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
         Exception exception = data.getException();
         if (data.getException() != null) {
             //Fragmentへのエラー通知を行う
-            //mListener.onShowTextMessage(data.getErrorMessage());
-            //mSwipeRefreshLayout.setRefreshing(false);
-            mListner.onHeadLineListUpdateError(data.getErrorMessage());
+            mListener.onHeadLineListUpdateError(data.getErrorMessage());
             return;
         }
 
@@ -124,7 +122,7 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
             }
         }
 
-        mListner.onHeadLineListUpdated(mHeadLineList);
+        mListener.onHeadLineListUpdated(mHeadLineList);
     }
 
     @Override
@@ -137,7 +135,7 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
      * @param listener リスナとして登録するクラスのインスタンス
      */
     public void addListener(HeadLineListModelListener listener) {
-        this.mListner = listener;
+        this.mListener = listener;
     }
 
     /**
@@ -145,8 +143,8 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
      * @param listener 削除するリスナ
      */
     public void removeListener(HeadLineListModelListener listener) {
-        if(this.mListner == listener) {
-            this.mListner = null;
+        if(this.mListener == listener) {
+            this.mListener = null;
         }
     }
 

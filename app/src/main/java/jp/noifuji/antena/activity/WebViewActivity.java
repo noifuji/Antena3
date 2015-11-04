@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.webkit.WebView;
+import android.widget.Toast;
 
 import jp.noifuji.antena.R;
 import jp.noifuji.antena.fragment.WebViewFragment;
@@ -37,6 +38,11 @@ public class WebViewActivity extends AppCompatActivity implements WebViewFragmen
     @Override
     public void registerWebView(WebView webview) {
         mWebView = webview;
+    }
+
+    @Override
+    public void onShowTextMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     @Override

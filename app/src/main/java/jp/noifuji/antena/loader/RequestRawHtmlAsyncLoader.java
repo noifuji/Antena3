@@ -10,6 +10,8 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 
+import jp.noifuji.antena.constants.ErrorMessage;
+
 /**
  * Created by Ryoma on 2015/10/24.
  */
@@ -46,6 +48,7 @@ public class RequestRawHtmlAsyncLoader extends AsyncTaskLoader<AsyncResult<Strin
             result.setData(doc.toString());
         } catch (IOException e) {
             e.printStackTrace();
+            result.setException(e, ErrorMessage.E001);
         }
 
         /*URL url = null;
