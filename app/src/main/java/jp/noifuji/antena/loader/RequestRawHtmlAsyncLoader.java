@@ -3,22 +3,17 @@ package jp.noifuji.antena.loader;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 
-import org.json.JSONArray;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Created by Ryoma on 2015/10/24.
  */
-public class RequestRawHtmlAsyncLoader extends AsyncTaskLoader<AsyncResult<JSONArray>> {
+public class RequestRawHtmlAsyncLoader extends AsyncTaskLoader<AsyncResult<String>> {
 
 
     private static final String TAG = "RequestRawHtml";
@@ -31,11 +26,31 @@ public class RequestRawHtmlAsyncLoader extends AsyncTaskLoader<AsyncResult<JSONA
     }
 
     @Override
-    public AsyncResult<JSONArray> loadInBackground() {
-        AsyncResult<JSONArray> result = new AsyncResult<JSONArray>();
+    public AsyncResult<String> loadInBackground() {
+        AsyncResult<String> result = new AsyncResult<String>();
 
-        URL url = null;
         try {
+            Document doc = Jsoup.connect(this.mUrl).get();
+            Elements asides = doc.getElementsByTag("aside");
+            for(Element aside : asides) {
+                aside.remove();
+            }
+            Elements scripts = doc.getElementsByTag("script");
+            for(Element script : scripts) {
+                script.remove();
+            }
+            Elements navs = doc.getElementsByTag("nav");
+            for(Element nav : navs) {
+                nav.remove();
+            }
+            result.setData(doc.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        /*URL url = null;
+        try {
+
             url = new URL(this.mUrl);
 
             HttpURLConnection urlconn = (HttpURLConnection) url.openConnection();
@@ -47,30 +62,29 @@ public class RequestRawHtmlAsyncLoader extends AsyncTaskLoader<AsyncResult<JSONA
 
             Map headers = urlconn.getHeaderFields();
             Iterator it = headers.keySet().iterator();
-            System.out.println("レスポンスヘッダ:");
+            Log.d(TAG, "レスポンスヘッダ:");
             while (it.hasNext()) {
                 String key = (String) it.next();
-                System.out.println("  " + key + ": " + headers.get(key));
+                Log.d(TAG, "  " + key + ": " + headers.get(key));
             }
 
-            System.out.println("レスポンスコード[" + urlconn.getResponseCode() + "] " +
+            Log.d(TAG, "レスポンスコード[" + urlconn.getResponseCode() + "] " +
                     "レスポンスメッセージ[" + urlconn.getResponseMessage() + "]");
-            System.out.println("\n---- ボディ ----");
+            Log.d(TAG, "---- ボディ ----");
 
             BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(urlconn.getInputStream()));
+                    new BufferedReader(new InputStreamReader(urlconn.getInputStream(), "UTF-8"));
 
             StringBuilder sb = new StringBuilder();
             while (true) {
                 String line = reader.readLine();
                 sb.append(line);
-                sb.append(System.getProperty("line.separator"));
+                //sb.append(System.getProperty("line.separator"));
                 if (line == null) {
                     break;
                 }
-                System.out.println(line);
             }
-            //result.setData();
+            result.setData(sb.toString());
 
             reader.close();
             urlconn.disconnect();
@@ -81,7 +95,7 @@ public class RequestRawHtmlAsyncLoader extends AsyncTaskLoader<AsyncResult<JSONA
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         return result;
     }

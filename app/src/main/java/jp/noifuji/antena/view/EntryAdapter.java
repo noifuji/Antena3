@@ -12,20 +12,20 @@ import android.widget.TextView;
 import java.util.List;
 
 import jp.noifuji.antena.R;
-import jp.noifuji.antena.entity.Entry;
+import jp.noifuji.antena.entity.HeadLine;
 
 /**
  * Created by Ryoma on 2015/10/24.
  */
-public class EntryAdapter extends ArrayAdapter<Entry> {
+public class EntryAdapter extends ArrayAdapter<HeadLine> {
 
     private Context mContext;
     private int mTextViewResourceId;
-    private List<Entry> mItems;
+    private List<HeadLine> mItems;
     private LayoutInflater mInflater;
 
 
-    public EntryAdapter(Context context, int resource, List<Entry> objects) {
+    public EntryAdapter(Context context, int resource, List<HeadLine> objects) {
         super(context, resource, objects);
 
         mContext = context;
@@ -41,7 +41,7 @@ public class EntryAdapter extends ArrayAdapter<Entry> {
      * @return
      */
     @Override
-    public Entry getItem(int position) {
+    public HeadLine getItem(int position) {
         return mItems.get(getCount() - 1 - position);
     }
 
@@ -55,7 +55,7 @@ public class EntryAdapter extends ArrayAdapter<Entry> {
             view = mInflater.inflate(mTextViewResourceId, null);
         }
 
-        Entry item = getItem(position);
+        HeadLine item = getItem(position);
 
         TextView titleTextView = (TextView) view.findViewById(R.id.title);
         TextView publicationDateTextView = (TextView) view.findViewById(R.id.publication_date);

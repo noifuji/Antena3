@@ -27,9 +27,6 @@ public class MainActivity extends AppCompatActivity implements EntryListFragment
             transaction.replace(R.id.entry_list_fragment, fragment);
             transaction.commit();
         }
-
-        // loaderの初期化
-        //getLoaderManager().initLoader(0, null, this);
     }
 
     @Override

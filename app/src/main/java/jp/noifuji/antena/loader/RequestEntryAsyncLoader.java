@@ -10,9 +10,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -21,7 +18,7 @@ import jp.noifuji.antena.constants.ErrorMessage;
 /**
  * Created by Ryoma on 2015/10/24.
  */
-public class RequestEntryAsyncLoader extends AsyncTaskLoader<AsyncResult<JSONArray>> {
+public class RequestEntryAsyncLoader extends AsyncTaskLoader<AsyncResult<String>> {
 
 
     private static final String TAG = "RequestEntryAsyncLoader";
@@ -34,8 +31,8 @@ public class RequestEntryAsyncLoader extends AsyncTaskLoader<AsyncResult<JSONArr
     }
 
     @Override
-    public AsyncResult<JSONArray> loadInBackground() {
-        AsyncResult<JSONArray> result = new AsyncResult<JSONArray>();
+    public AsyncResult<String> loadInBackground() {
+        AsyncResult<String> result = new AsyncResult<String>();
         HttpClient httpClient = new DefaultHttpClient();
         //HttpGet httpGet = new HttpGet("https://antena-noifuji.c9.io/entry" + "?time=" + mLatestPublicationDate);
         HttpGet httpGet = new HttpGet("http://183.181.0.117:8080/entry" + "?time=" + mLatestPublicationDate);
@@ -52,7 +49,7 @@ public class RequestEntryAsyncLoader extends AsyncTaskLoader<AsyncResult<JSONArr
             return result;
         }
 
-        JSONArray jsonEntries = null;
+/*        JSONArray jsonEntries = null;
         try {
         JSONObject jsonResponse = new JSONObject(str);
 
@@ -62,6 +59,9 @@ public class RequestEntryAsyncLoader extends AsyncTaskLoader<AsyncResult<JSONArr
             e.printStackTrace();
         }
         result.setData(jsonEntries);
+        */
+
+        result.setData(str);
 
         return result;
     }
