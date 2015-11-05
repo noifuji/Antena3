@@ -64,7 +64,9 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
         if(mHeadLineList.size() == 0) {
             return null;
         }
-        return mHeadLineList.get(mHeadLineList.size()-1);
+        HeadLine hl = mHeadLineList.get(mHeadLineList.size()-1);
+        Log.d(TAG, "latest entry's title:" + hl.getmTitle());
+        return hl;
     }
 
     /**
@@ -80,7 +82,7 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
         } else {
             data.putString("latestPubDate", hl.getmPublicationDate());
         }
-        mLoader = lm.initLoader(LOADER_ID, data, this);
+        mLoader = lm.restartLoader(LOADER_ID, data, this);
         mLoader.forceLoad();
     }
 
@@ -113,6 +115,7 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
             try {
                 JSONObject jsonEntry = jsonEntries.getJSONObject(i);
                 HeadLine headLine = new HeadLine(jsonEntry);
+                Log.d(TAG, "title:" + headLine.getmTitle());
                 mHeadLineList.add(headLine);
                 if (mHeadLineList.size() > ENTRY_LIST_LIMIT) {
                     mHeadLineList.remove(0);
@@ -122,7 +125,7 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
             }
         }
 
-        mListener.onHeadLineListUpdated(mHeadLineList);
+        mListener.onHeadLineListUpdated(mHeadLineList, jsonEntries.length());
     }
 
     @Override
@@ -157,15 +160,16 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
      */
     public interface HeadLineListModelListener {
         /**
-         * エラー時
+         * 記事のヘッドラインの更新確認に失敗した場合に呼び出されます。
          * @param errorMessage
          */
         void onHeadLineListUpdateError(String errorMessage);
 
         /**
-         * 正常時
-         * @param headlineList
+         * 記事のヘッドラインの更新確認が完了した場合に呼び出されます。
+         * @param headlineList モデルが保持しているヘッドライン情報
+         * @param updatedCount 更新された件数
          */
-        void onHeadLineListUpdated(List<HeadLine> headlineList);
+        void onHeadLineListUpdated(List<HeadLine> headlineList, int updatedCount);
     }
 }

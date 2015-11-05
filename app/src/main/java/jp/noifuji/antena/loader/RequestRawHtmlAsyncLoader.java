@@ -2,11 +2,10 @@ package jp.noifuji.antena.loader;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
+import android.util.Log;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.IOException;
 
@@ -15,7 +14,7 @@ import jp.noifuji.antena.constants.ErrorMessage;
 /**
  * Created by Ryoma on 2015/10/24.
  */
-public class RequestRawHtmlAsyncLoader extends AsyncTaskLoader<AsyncResult<String>> {
+public class RequestRawHtmlAsyncLoader extends AsyncTaskLoader<AsyncResult<Document>> {
 
 
     private static final String TAG = "RequestRawHtml";
@@ -28,24 +27,13 @@ public class RequestRawHtmlAsyncLoader extends AsyncTaskLoader<AsyncResult<Strin
     }
 
     @Override
-    public AsyncResult<String> loadInBackground() {
-        AsyncResult<String> result = new AsyncResult<String>();
+    public AsyncResult<Document> loadInBackground() {
+        AsyncResult<Document> result = new AsyncResult<Document>();
 
         try {
+            Log.e(TAG, "url is " + this.mUrl);
             Document doc = Jsoup.connect(this.mUrl).get();
-            Elements asides = doc.getElementsByTag("aside");
-            for(Element aside : asides) {
-                aside.remove();
-            }
-            Elements scripts = doc.getElementsByTag("script");
-            for(Element script : scripts) {
-                script.remove();
-            }
-            Elements navs = doc.getElementsByTag("nav");
-            for(Element nav : navs) {
-                nav.remove();
-            }
-            result.setData(doc.toString());
+            result.setData(doc);
         } catch (IOException e) {
             e.printStackTrace();
             result.setException(e, ErrorMessage.E001);

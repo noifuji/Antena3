@@ -87,6 +87,7 @@ public class EntryListFragment extends Fragment implements HeadLineListModel.Hea
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                Log.d(TAG, "onRefresh");
                 mHeadLineListModel.update(EntryListFragment.this.getActivity(), getLoaderManager());
             }
         });
@@ -139,10 +140,15 @@ public class EntryListFragment extends Fragment implements HeadLineListModel.Hea
     }
 
     @Override
-    public void onHeadLineListUpdated(List<HeadLine> headlineList) {
-        EntryAdapter adapter = new EntryAdapter(this.getActivity(), R.layout.list_item, headlineList);
-        mListView.setAdapter(adapter);
+    public void onHeadLineListUpdated(List<HeadLine> headlineList, int updatedCount) {
+        if (updatedCount > 0) {
+            EntryAdapter adapter = new EntryAdapter(this.getActivity(), R.layout.list_item, headlineList);
+            mListView.setAdapter(adapter);
+        }
+
+        //更新ダイアログを停止する。
         mSwipeRefreshLayout.setRefreshing(false);
+
     }
 
     /**
@@ -157,6 +163,7 @@ public class EntryListFragment extends Fragment implements HeadLineListModel.Hea
      */
     public interface OnFragmentInteractionListener {
         void onStartWebView(String uri);
+
         void onShowTextMessage(String message);
     }
 

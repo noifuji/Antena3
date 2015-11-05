@@ -1,4 +1,5 @@
-package jp.noifuji.antena.activity;
+package jp.noifuji.antena.loader;
+
 
 import android.app.LoaderManager;
 import android.content.Loader;
@@ -6,25 +7,24 @@ import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 
-import org.json.JSONArray;
+import org.jsoup.nodes.Document;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import jp.noifuji.antena.loader.AsyncResult;
-import jp.noifuji.antena.loader.RequestRawHtmlAsyncLoader;
+import jp.noifuji.antena.activity.MainActivity;
 
 /**
  * Created by ryoma on 2015/11/04.
  */
-public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
+public class RequestRawHtmlAsyncLoaderTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
-    private static final String TAG = "MainActivityTest";
+    private static final String TAG = "RequestRawHtmlALTest";
     private MainActivity mActivity;
     CountDownLatch mLatch;
 
-    public MainActivityTest() {
+    public RequestRawHtmlAsyncLoaderTest() {
         super(MainActivity.class);
     }
 
@@ -43,24 +43,24 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
                 Log.d(TAG, "run");
                 mActivity.getLoaderManager()
                         .initLoader(0, null,
-                                new LoaderManager.LoaderCallbacks<AsyncResult<JSONArray>>() {
+                                new LoaderManager.LoaderCallbacks<AsyncResult<Document>>() {
                                     @Override
-                                    public Loader<AsyncResult<JSONArray>> onCreateLoader(int id, Bundle args) {
+                                    public Loader<AsyncResult<Document>> onCreateLoader(int id, Bundle args) {
                                         Log.d(TAG, "onCreateLoader");
-                                        RequestRawHtmlAsyncLoader loader = new RequestRawHtmlAsyncLoader(mActivity, "http://himasoku.com/archives/51926959.html");
+                                        RequestRawHtmlAsyncLoader loader = new RequestRawHtmlAsyncLoader(mActivity, "http://www.google.co.jp");
                                         loader.forceLoad();
                                         return loader;
                                     }
 
                                     @Override
-                                    public void onLoadFinished(Loader<AsyncResult<JSONArray>> loader,
-                                                               AsyncResult<JSONArray> data) {
+                                    public void onLoadFinished(Loader<AsyncResult<Document>> loader,
+                                                               AsyncResult<Document> data) {
                                         Log.d(TAG, "onLoadFinished");
                                         mLatch.countDown();
                                     }
 
                                     @Override
-                                    public void onLoaderReset(Loader<AsyncResult<JSONArray>> loader) {
+                                    public void onLoaderReset(Loader<AsyncResult<Document>> loader) {
 
                                     }
                                 });
