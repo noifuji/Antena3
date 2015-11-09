@@ -44,7 +44,6 @@ public class EntryListFragment extends Fragment implements HeadLineListModel.Hea
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mHeadLineListModel = ModelFactory.getInstance().getmHeadLineListModel(this.getActivity().getApplication());
-        mHeadLineListModel.addListener(this);
         Log.d(TAG, "EntryList has " + mHeadLineListModel.getHeadLineList().size() + " entries.");
     }
 
@@ -126,12 +125,24 @@ public class EntryListFragment extends Fragment implements HeadLineListModel.Hea
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        mHeadLineListModel.addListener(this);
+    }
+
+    @Override
     public void onDetach() {
         Log.d(TAG, "entered onDetach()");
         mListener = null;
+        super.onDetach();
+    }
+
+    @Override
+    public void onStop() {
+        Log.d(TAG, "entered onStop()");
         mHeadLineListModel.removeListener(this);
         mHeadLineListModel.saveHeadLineList(this.getActivity());
-        super.onDetach();
+        super.onStop();
     }
 
     @Override

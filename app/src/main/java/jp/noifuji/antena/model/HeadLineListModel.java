@@ -97,7 +97,9 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
         Exception exception = data.getException();
         if (data.getException() != null) {
             //Fragmentへのエラー通知を行う
-            mListener.onHeadLineListUpdateError(data.getErrorMessage());
+            if(mListener != null) {
+                mListener.onHeadLineListUpdateError(data.getErrorMessage());
+            }
             return;
         }
 
@@ -125,7 +127,9 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
             }
         }
 
-        mListener.onHeadLineListUpdated(mHeadLineList, jsonEntries.length());
+        if(mListener != null) {
+            mListener.onHeadLineListUpdated(mHeadLineList, jsonEntries.length());
+        }
     }
 
     @Override

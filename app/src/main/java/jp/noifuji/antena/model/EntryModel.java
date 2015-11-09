@@ -33,7 +33,7 @@ public class EntryModel implements LoaderManager.LoaderCallbacks<AsyncResult<Doc
         this.mContext = context;
         Bundle data = new Bundle();
         data.putString("URL", url);
-        mLoader = lm.initLoader(LOADER_ID, data, this);
+        mLoader = lm.restartLoader(LOADER_ID, data, this);
         mLoader.forceLoad();
     }
 
@@ -41,9 +41,9 @@ public class EntryModel implements LoaderManager.LoaderCallbacks<AsyncResult<Doc
         if(doc == null || tagName == null) {
             throw new AntenaSystemException();
         }
-        Elements asides = doc.getElementsByTag(tagName);
-        for (Element aside : asides) {
-            aside.remove();
+        Elements tags = doc.getElementsByTag(tagName);
+        for (Element tag : tags) {
+            tag.remove();
         }
         return doc;
     }
