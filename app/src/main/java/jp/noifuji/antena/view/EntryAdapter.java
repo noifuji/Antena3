@@ -56,14 +56,21 @@ public class EntryAdapter extends ArrayAdapter<HeadLine> {
         }
 
         HeadLine item = getItem(position);
-
+        TextView tagNewTextView = (TextView) view.findViewById(R.id.tag_new);
         TextView titleTextView = (TextView) view.findViewById(R.id.title);
         TextView publicationDateTextView = (TextView) view.findViewById(R.id.publication_date);
         TextView siteTitleTextView = (TextView) view.findViewById(R.id.site_title);
 
         titleTextView.setText(item.getmTitle());
-        publicationDateTextView.setText(item.getFormedPublicationDate("MM/dd HH:mm"));
+        //publicationDateTextView.setText(item.getFormedPublicationDate("MM/dd HH:mm"));
+        publicationDateTextView.setText(item.getTwitterLikeDate());
         siteTitleTextView.setText(item.getmSiteTitle());
+
+        if(item.isNew()) {
+            tagNewTextView.setVisibility(View.VISIBLE);
+        } else {
+            tagNewTextView.setVisibility(View.GONE);
+        }
 
         if(item.isRead()) {
             titleTextView.setTypeface(null, Typeface.NORMAL);

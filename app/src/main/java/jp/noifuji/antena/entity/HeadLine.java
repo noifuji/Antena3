@@ -29,6 +29,7 @@ public class HeadLine implements Serializable {
     private String mSummary = "";
     private String mThumbnailUrl = "";
     private boolean isRead = false;
+    private boolean isNew = true;
 
     public HeadLine() {
     }
@@ -84,6 +85,23 @@ public class HeadLine implements Serializable {
         this.mPublicationDate = mPublicationDate;
     }
 
+    public String getTwitterLikeDate() {
+        Date now = new Date();
+        Date publication = new Date(Long.valueOf(mPublicationDate));
+        long diff = now.getTime() - publication.getTime();
+        String result = "";
+
+        if(diff < 1000*60*60) {
+            result = diff/(1000*60) + "分前";
+        } else if(diff >= 1000*60 && diff < 1000*60*60*24) {
+            result = diff/(1000*60*60) + "時間前";
+        } else {
+            result = getFormedPublicationDate("MM/dd HH:mm");
+        }
+
+        return result;
+    }
+
     public String getmSiteTitle() {
         return mSiteTitle;
     }
@@ -115,5 +133,13 @@ public class HeadLine implements Serializable {
 
     public void setIsRead(boolean isRead) {
         this.isRead = isRead;
+    }
+
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setIsNew(boolean isNew) {
+        this.isNew = isNew;
     }
 }

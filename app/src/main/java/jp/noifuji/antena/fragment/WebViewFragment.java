@@ -13,13 +13,14 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import java.util.ArrayList;
-
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import jp.noifuji.antena.R;
-import jp.noifuji.antena.activity.WebViewActivity;
 import jp.noifuji.antena.entity.HtmlHistory;
+import jp.noifuji.antena.entity.HtmlPage;
 import jp.noifuji.antena.model.EntryModel;
 import jp.noifuji.antena.model.ModelFactory;
+import jp.noifuji.antena.util.Utils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,14 +28,18 @@ import jp.noifuji.antena.model.ModelFactory;
  * {@link WebViewFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  */
-public class WebViewFragment extends Fragment implements EntryModel.EntryModelListener, WebViewActivity.BackKeyListener{
+public class WebViewFragment extends Fragment implements EntryModel.EntryModelListener {
     private static final String TAG = "WebViewFragment";
-    private WebView webView;
-    private View mProgressBar;
     private OnFragmentInteractionListener mListener;
     private EntryModel mEntryModel;
-    private ArrayList<HtmlHistory> mHtmlPageStack;
+    private HtmlHistory mHtmlPageStack;
     private boolean isGoBack = false;
+    private HtmlPage mCurrentHtmlPage;
+
+    @Bind(R.id.webView)
+    WebView webView;
+    @Bind(R.id.progress_view)
+    View mProgressBar;
 
     public WebViewFragment() {
         // Required empty public constructor
@@ -45,7 +50,7 @@ public class WebViewFragment extends Fragment implements EntryModel.EntryModelLi
         super.onCreate(savedInstanceState);
         mEntryModel = ModelFactory.getInstance().getmEntryModel();
         mEntryModel.addListener(this);
-        mHtmlPageStack = new ArrayList<>();
+        mHtmlPageStack = new HtmlHistory();
     }
 
     @Override
@@ -53,13 +58,10 @@ public class WebViewFragment extends Fragment implements EntryModel.EntryModelLi
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_web_view, container, false);
+        ButterKnife.bind(this, view);
 
-        mProgressBar = view.findViewById(R.id.progress_view);
-
-        //レイアウトで指定したWebViewのIDを指定する。
-        webView = (WebView) view.findViewById(R.id.webView);
-
-        //リンクをタップしたときに標準ブラウザを起動させない
+        //ズーム可
+        webView.getSettings().setBuiltInZoomControls(true);
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
@@ -71,15 +73,16 @@ public class WebViewFragment extends Fragment implements EntryModel.EntryModelLi
                 super.onPageFinished(view, url);
                 mProgressBar.setVisibility(View.GONE);
                 if (isGoBack) {
+                    //バックキーが押されている場合、ヒストリーからポップする。
                     isGoBack = false;
+                    mCurrentHtmlPage = mHtmlPageStack.pop();
+                    //時間をずらしてスクロールさせないと動かない
                     view.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            Log.d(TAG, "Load position X:" + mHtmlPageStack.get(mHtmlPageStack.size() - 2).getmScrollX() + ", Y:" + mHtmlPageStack.get(mHtmlPageStack.size() - 2).getmScrollY());
+                            Log.d(TAG, "Load position X:" + mCurrentHtmlPage.getmScrollX() + ", Y:" + mCurrentHtmlPage.getmScrollY());
                             webView.setScrollX(0);
-                            webView.setScrollY(mHtmlPageStack.get(mHtmlPageStack.size() - 2).getmScrollY());
-                            Log.d(TAG, "present position X:" + webView.getScrollX() + ", Y:" + webView.getScrollY());
-                            mHtmlPageStack.remove(mHtmlPageStack.size() - 1);
+                            webView.setScrollY(mCurrentHtmlPage.getmScrollY());
                         }
                         // Delay the scrollTo to make it work
                     }, 100);
@@ -87,19 +90,23 @@ public class WebViewFragment extends Fragment implements EntryModel.EntryModelLi
 
             }
 
-
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 Log.d(TAG, "Clicked URL =  " + url);
-                Log.d(TAG, "Save position X:" + webView.getScrollX() + ", Y:" + webView.getScrollY());
-                mHtmlPageStack.get(mHtmlPageStack.size() - 1).setmScrollX(webView.getScrollX());
-                mHtmlPageStack.get(mHtmlPageStack.size() - 1).setmScrollY(webView.getScrollY());
-                mEntryModel.loadEntry(WebViewFragment.this.getActivity(), getLoaderManager(), url);
+                mCurrentHtmlPage.setmScrollX(webView.getScrollX());
+                mCurrentHtmlPage.setmScrollY(webView.getScrollY());
+                mHtmlPageStack.add(mCurrentHtmlPage);
+
+                if (Utils.isPictureUrl(url)) {
+                    //画像URLであれば、htmlをパースせずにそのまま表示する。
+                    webView.loadUrl(url);
+                } else {
+                    mEntryModel.loadEntry(WebViewFragment.this.getActivity(), getLoaderManager(), url);
+                }
                 mProgressBar.setVisibility(View.VISIBLE);
                 return true;
             }
         });
-
 
         Intent intent = this.getActivity().getIntent();
         mEntryModel.loadEntry(this.getActivity(), getLoaderManager(), intent.getStringExtra("URI"));
@@ -112,7 +119,7 @@ public class WebViewFragment extends Fragment implements EntryModel.EntryModelLi
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-//            mListener = (OnFragmentInteractionListener) activity;
+            mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -129,32 +136,32 @@ public class WebViewFragment extends Fragment implements EntryModel.EntryModelLi
     }
 
     @Override
-    public void onDestroy() {
-        Log.d(TAG, "onDestroy()");
+    public void onDestroyView() {
+        Log.d(TAG, "onDestroyView()");
         super.onDestroy();
+        ButterKnife.unbind(this);
     }
 
     @Override
     public void onLoadEntryError(String errorMessage) {
         mProgressBar.setVisibility(View.GONE);
-//        mListener.onShowTextMessage(errorMessage);
+        mListener.onShowTextMessage(errorMessage);
     }
 
     @Override
-    public void onEntryLoaded(String html) {
+    public void onEntryLoaded(String html, String url) {
         Log.d(TAG, "html length:" + html.length());
-        mHtmlPageStack.add(new HtmlHistory(html));
         //webView.loadData(html, "text/html; charset=utf-8", "UTF-8");  buggyらしい
         webView.loadDataWithBaseURL(null, html, "text/html; charset=utf-8", "UTF-8", null);//webviewのhistoryにためない
+        mCurrentHtmlPage = new HtmlPage(html);
     }
 
-    @Override
     public void onBackPressed(Activity activity) {
         Log.d(TAG, "onBackPressed mHtmlPageStack = " + mHtmlPageStack.size());
-        if(mHtmlPageStack.size() > 1) {
+        if(mHtmlPageStack.size() > 0) {
             this.isGoBack = true;
             //前ページをロードする
-            webView.loadDataWithBaseURL(null, mHtmlPageStack.get(mHtmlPageStack.size() - 2).getmHtml(), "text/html; charset=utf-8", "UTF-8", null);
+            webView.loadDataWithBaseURL(null, mHtmlPageStack.getLatestHistory().getmHtml(), "text/html; charset=utf-8", "UTF-8", null);
         } else {
             //ヒストリがなくなったら、リスト画面に戻る
             mHtmlPageStack = null;
@@ -177,7 +184,5 @@ public class WebViewFragment extends Fragment implements EntryModel.EntryModelLi
         public void onFragmentInteraction(Uri uri);
         void onShowTextMessage(String message);
     }
-
-    //onPageLoad html保存    urlクリック 場所保存 ページ遷移 バック スタック参照 htmlロード 場所ロード
 
 }

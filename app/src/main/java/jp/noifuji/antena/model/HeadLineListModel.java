@@ -113,6 +113,11 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
             e.printStackTrace();
         }
 
+        //すでにリスト内に存在する記事情報のNEWフラグをfalseにしておく
+        for(HeadLine h : mHeadLineList) {
+            h.setIsNew(false);
+        }
+
         for (int i = jsonEntries.length() - 1; i >= 0; i--) {
             try {
                 JSONObject jsonEntry = jsonEntries.getJSONObject(i);

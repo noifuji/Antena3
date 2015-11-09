@@ -1,46 +1,42 @@
 package jp.noifuji.antena.entity;
 
+import java.util.ArrayList;
+
 /**
- * Created by Ryoma on 2015/11/09.
+ * Created by ryoma on 2015/11/09.
  */
-public class HtmlHistory {
-    private int mScrollX;
-    private int mScrollY;
-    private  String mHtml;
+public class HtmlHistory extends ArrayList<HtmlPage> {
+    public HtmlPage getLatestHistory() {
+        if(this.size() == 0) {
+            return null;
+        }
 
-    public HtmlHistory(String html, int scrollX, int scrollY) {
-        this.mHtml = html;
-        this.mScrollX = scrollX;
-        this.mScrollY = scrollY;
+        return get(this.size() - 1);
     }
 
-    public HtmlHistory(String mHtml) {
-        this.mHtml = mHtml;
+    /**
+     * ヒストリがあればtrue
+     * @return
+     */
+    public boolean hasHistory() {
+        if (this.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public String getmHtml() {
-        return mHtml;
+    public void push(HtmlPage h) {
+        this.add(h);
     }
 
-    public void setmHtml(String mHtml) {
-        this.mHtml = mHtml;
+    public HtmlPage pop() {
+        if(this.size() == 0) {
+            return null;
+        }
+
+        HtmlPage h = this.getLatestHistory();
+        this.remove(this.size()-1);
+        return h;
     }
-
-
-    public int getmScrollY() {
-        return mScrollY;
-    }
-
-    public void setmScrollY(int mScrollY) {
-        this.mScrollY = mScrollY;
-    }
-
-    public int getmScrollX() {
-        return mScrollX;
-    }
-
-    public void setmScrollX(int mScrollX) {
-        this.mScrollX = mScrollX;
-    }
-
 }

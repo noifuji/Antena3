@@ -86,4 +86,15 @@ public class Utils {
 
         return cal.getTime();
     }
+
+    public static boolean isPictureUrl(String url) {
+        String suffix[] = {".jpg", ".gif", ".jpeg", ".png"};
+
+        for(String s : suffix) {
+            if(url.endsWith(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

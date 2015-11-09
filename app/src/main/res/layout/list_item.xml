@@ -2,36 +2,69 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:paddingBottom="5dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="5dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp">
+        <TextView
+            android:id="@+id/tag_new"
+            android:layout_width="35dp"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:gravity="center"
+            android:text="@string/tag_new"
+            android:visibility="gone"
+            android:background="@color/ripple"
+            />
+
+        <TextView
+            android:id="@+id/site_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingEnd="0dp"
+            android:paddingStart="5dp"
+            android:textSize="15sp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:layout_weight="1"
+            android:text="VIPPER速報"
+            />
+
+        <TextView
+            android:id="@+id/publication_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:paddingRight="5dp"
+            android:paddingLeft="5dp"
+            android:textSize="14sp"
+            android:text="11/09 15:17"
+            />
+
+
+
+
+    </LinearLayout>
+
+
 
     <TextView
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
         android:textStyle="bold"
-        android:textSize="17dip"
+        android:textSize="17sp"
+        android:text="【緊急】ことわざの一部を「バハムート」に置き換えても違和感が無いことわざって何かあるか?"
         />
-    <TextView
-        android:id="@+id/site_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingRight="5dp"
-        android:paddingBottom="5dp"
-        android:textSize="15dip"
-        android:gravity="right"
-        />
-    <TextView
-        android:id="@+id/publication_date"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingRight="5dp"
-        android:textSize="14dip"
-        android:gravity="right"
-        />
+
 
 
 </LinearLayout>

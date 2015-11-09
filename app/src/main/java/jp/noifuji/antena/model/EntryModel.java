@@ -70,7 +70,20 @@ public class EntryModel implements LoaderManager.LoaderCallbacks<AsyncResult<Doc
             htmlDoc = removeTagFromHtml(htmlDoc, "aside");
             htmlDoc = removeTagFromHtml(htmlDoc, "script");
             htmlDoc = removeTagFromHtml(htmlDoc, "nav");
-            mListener.onEntryLoaded(htmlDoc.toString());
+            htmlDoc = removeTagFromHtml(htmlDoc, "ul");
+
+            //ページ上のリンクを削除する。
+            //数ページにわたる記事や、画像リンクを踏むことができない。
+/*            Elements elements = htmlDoc.getElementsByAttribute("href");
+            for(Element element : elements) {
+                String link = element.attr("href");
+                Log.d(TAG,element.tagName() + " : " + element.childNodeSize() + " : " +link);
+                if(!element.tagName().equals("link")) {
+                    element.removeAttr("href");
+                }
+            }*/
+
+            mListener.onEntryLoaded(htmlDoc.toString(), htmlDoc.baseUri());
         }
     }
 
@@ -115,6 +128,6 @@ public class EntryModel implements LoaderManager.LoaderCallbacks<AsyncResult<Doc
          *
          * @param html
          */
-        void onEntryLoaded(String html);
+        void onEntryLoaded(String html, String url);
     }
 }

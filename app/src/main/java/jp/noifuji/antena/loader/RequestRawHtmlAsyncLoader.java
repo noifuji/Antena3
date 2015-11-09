@@ -19,7 +19,7 @@ public class RequestRawHtmlAsyncLoader extends AsyncTaskLoader<AsyncResult<Docum
 
     private static final String TAG = "RequestRawHtml";
 
-    private static String mUrl;
+    private String mUrl;
 
     public RequestRawHtmlAsyncLoader(Context context, String url) {
         super(context);
@@ -28,7 +28,7 @@ public class RequestRawHtmlAsyncLoader extends AsyncTaskLoader<AsyncResult<Docum
 
     @Override
     public AsyncResult<Document> loadInBackground() {
-        AsyncResult<Document> result = new AsyncResult<Document>();
+        AsyncResult<Document> result = new AsyncResult<>();
 
         try {
             Log.e(TAG, "url is " + this.mUrl);
