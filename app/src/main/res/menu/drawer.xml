@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/new_entry"
+            android:checked="false"
+            android:icon="@drawable/up_24dp_xx"
+            android:title="@string/new_arrival" />
+
+        <item
+            android:id="@+id/news"
+            android:checked="false"
+            android:icon="@drawable/up_24dp_xx"
+            android:title="@string/news" />
+
+        <item
+            android:id="@+id/vip"
+            android:checked="false"
+            android:icon="@drawable/up_24dp_xx"
+            android:title="@string/vip" />
+
+        <item
+            android:id="@+id/money"
+            android:checked="false"
+            android:icon="@drawable/up_24dp_xx"
+            android:title="@string/money" />
+
+        <item
+            android:id="@+id/sports"
+            android:checked="false"
+            android:icon="@drawable/up_24dp_xx"
+            android:title="@string/sports" />
+
+        <item
+            android:id="@+id/kijo"
+            android:checked="false"
+            android:icon="@drawable/up_24dp_xx"
+            android:title="@string/kijo" />
+
+    </group>
+</menu>

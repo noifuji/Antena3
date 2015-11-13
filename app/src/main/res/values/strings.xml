@@ -5,6 +5,13 @@
     <string name="title_activity_web_view">Antena</string>
     <string name="tag_new">NEW</string>
 
+    <string name="new_arrival">新着</string>
+    <string name="news">ニュース</string>
+    <string name="vip">VIP</string>
+    <string name="sports">スポーツ</string>
+    <string name="kijo">鬼女</string>
+    <string name="money">マネー</string>
+
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

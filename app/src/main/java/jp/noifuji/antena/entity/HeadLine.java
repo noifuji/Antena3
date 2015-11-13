@@ -19,6 +19,7 @@ public class HeadLine implements Serializable {
     private static final String SUMMARY = "summary";
     private static final String URL = "url";
     private static final String THUMBNAIL = "thumbnail";
+    private static final String CATEGORY = "category";
 
 
     private String mSysId = "";
@@ -28,6 +29,7 @@ public class HeadLine implements Serializable {
     private String mSiteTitle = "";
     private String mSummary = "";
     private String mThumbnailUrl = "";
+    private String mCategory = "";
     private boolean isRead = false;
     private boolean isNew = true;
 
@@ -47,6 +49,7 @@ public class HeadLine implements Serializable {
         setmSummary(json.getString(SUMMARY));
         setmUrl(json.getString(URL));
         setmThumbnailUrl(json.getString(THUMBNAIL));
+        setmCategory(json.getString(CATEGORY));
     }
 
     public String getmSysId() {
@@ -141,5 +144,13 @@ public class HeadLine implements Serializable {
 
     public void setIsNew(boolean isNew) {
         this.isNew = isNew;
+    }
+
+    public String getmCategory() {
+        return mCategory;
+    }
+
+    public void setmCategory(String mCategory) {
+        this.mCategory = mCategory;
     }
 }

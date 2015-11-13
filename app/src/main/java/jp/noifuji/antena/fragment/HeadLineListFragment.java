@@ -14,6 +14,8 @@ import android.widget.ListView;
 
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import jp.noifuji.antena.R;
 import jp.noifuji.antena.entity.HeadLine;
 import jp.noifuji.antena.model.HeadLineListModel;
@@ -27,31 +29,51 @@ import jp.noifuji.antena.view.EntryAdapter;
  * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
  */
-public class EntryListFragment extends Fragment implements HeadLineListModel.HeadLineListModelListener {
-    private static final String TAG = "EntryListFragment";
+public class HeadLineListFragment extends Fragment implements HeadLineListModel.HeadLineListModelListener {
+    private static final String TAG = "HeadLineListFragment";
+    private static final String CATEGORY = "category";
     private ListView mListView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private FloatingActionButton mUpButton;
     private HeadLineListModel mHeadLineListModel;
     private OnFragmentInteractionListener mListener;
+    private String mCategory;
 
-    public EntryListFragment() {
+
+    @Bind(R.id.headline_list_progress)
+    View mProgressBar;
+
+    public HeadLineListFragment() {
         // Required empty public constructor
         //
     }
 
+    public static HeadLineListFragment newInstance(String category) {
+        HeadLineListFragment fragment = new HeadLineListFragment();
+        Bundle args = new Bundle();
+        args.putString(CATEGORY, category);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mCategory = getArguments().getString(CATEGORY);
+        }
         mHeadLineListModel = ModelFactory.getInstance().getmHeadLineListModel(this.getActivity().getApplication());
-        Log.d(TAG, "EntryList has " + mHeadLineListModel.getHeadLineList().size() + " entries.");
+        Log.d(TAG, "NEW EntryList has " + mHeadLineListModel.getHeadLineList(mCategory).size() + " entries.");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
         // Inflate the layout for this fragment   kl
         View view = inflater.inflate(R.layout.fragment_entry_list, container, false);
+        ButterKnife.bind(this, view);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_layout);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.swipe_color_1,
@@ -67,27 +89,24 @@ public class EntryListFragment extends Fragment implements HeadLineListModel.Hea
             }
         });
 
-        if (mHeadLineListModel.getHeadLineList().size() == 0) {
-            //ストレージに何も保存されていなければアップデートする
-            mHeadLineListModel.update(this.getActivity(), getLoaderManager());
-        } else {
-            //前回の内容をそのまま表示
-            EntryAdapter adapter = new EntryAdapter(this.getActivity(), R.layout.list_item, mHeadLineListModel.getHeadLineList());
-            mListView.setAdapter(adapter);
-        }
+        //アップデートする
+        mHeadLineListModel.pullNewHeadLine(this.getActivity(), getLoaderManager(), mCategory);
 
         return view;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        Log.d(TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
+        mListener.onSetTitle(mCategory);
+        mProgressBar.setVisibility(View.GONE);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 Log.d(TAG, "onRefresh");
-                mHeadLineListModel.update(EntryListFragment.this.getActivity(), getLoaderManager());
+                mHeadLineListModel.pullNewHeadLine(HeadLineListFragment.this.getActivity(), getLoaderManager(), mCategory);
             }
         });
 
@@ -115,6 +134,7 @@ public class EntryListFragment extends Fragment implements HeadLineListModel.Hea
 
     @Override
     public void onAttach(Activity activity) {
+        Log.d(TAG, "onAttach");
         super.onAttach(activity);
         try {
             mListener = (OnFragmentInteractionListener) activity;
@@ -146,8 +166,17 @@ public class EntryListFragment extends Fragment implements HeadLineListModel.Hea
     }
 
     @Override
+    public void onDestroyView() {
+        Log.d(TAG, "onDestroyView()");
+        super.onDestroy();
+        ButterKnife.unbind(this);
+    }
+
+    @Override
     public void onHeadLineListUpdateError(String errorMessage) {
         mListener.onShowTextMessage(errorMessage);
+        EntryAdapter adapter = new EntryAdapter(this.getActivity(), R.layout.list_item, mHeadLineListModel.getHeadLineList(mCategory));
+        mListView.setAdapter(adapter);
     }
 
     @Override
@@ -155,11 +184,19 @@ public class EntryListFragment extends Fragment implements HeadLineListModel.Hea
         if (updatedCount > 0) {
             EntryAdapter adapter = new EntryAdapter(this.getActivity(), R.layout.list_item, headlineList);
             mListView.setAdapter(adapter);
+            mCategory = headlineList.get(0).getmCategory();
+        } else {
+            EntryAdapter adapter = new EntryAdapter(this.getActivity(), R.layout.list_item, mHeadLineListModel.getHeadLineList(mCategory));
+            mListView.setAdapter(adapter);
         }
 
         //更新ダイアログを停止する。
         mSwipeRefreshLayout.setRefreshing(false);
 
+    }
+
+    public void setViewGone() {
+        mListView.setVisibility(View.GONE);
     }
 
     /**
@@ -176,6 +213,8 @@ public class EntryListFragment extends Fragment implements HeadLineListModel.Hea
         void onStartWebView(String uri);
 
         void onShowTextMessage(String message);
+
+        void onSetTitle(String category);
     }
 
 

@@ -18,24 +18,32 @@ import jp.noifuji.antena.constants.ErrorMessage;
 /**
  * Created by Ryoma on 2015/10/24.
  */
-public class RequestEntryAsyncLoader extends AsyncTaskLoader<AsyncResult<String>> {
+public class RequestNewHeadLineAsyncLoader extends AsyncTaskLoader<AsyncResult<String>> {
 
 
-    private static final String TAG = "RequestEntryAsyncLoader";
+    private static final String TAG = "RequestHeadLine";
 
     private String mLatestPublicationDate;
+    private String mCategory;
 
-    public RequestEntryAsyncLoader(Context context, String latestPublicationDate) {
+    public RequestNewHeadLineAsyncLoader(Context context, String latestPublicationDate) {
         super(context);
         mLatestPublicationDate = latestPublicationDate;
+        mCategory = "";
+    }
+
+    public RequestNewHeadLineAsyncLoader(Context context, String latestPublicationDate, String category) {
+        super(context);
+        mLatestPublicationDate = latestPublicationDate;
+        mCategory = category;
     }
 
     @Override
     public AsyncResult<String> loadInBackground() {
         AsyncResult<String> result = new AsyncResult<String>();
         HttpClient httpClient = new DefaultHttpClient();
-        //HttpGet httpGet = new HttpGet("https://antena-noifuji.c9.io/entry" + "?time=" + mLatestPublicationDate);
-        HttpGet httpGet = new HttpGet("http://183.181.0.117:8080/entry" + "?time=" + mLatestPublicationDate);
+        HttpGet httpGet = new HttpGet("https://antena-noifuji.c9.io/entry" + "?time=" + mLatestPublicationDate + "&category=" + mCategory);
+        //HttpGet httpGet = new HttpGet("http://183.181.0.117:8080/entry" + "?time=" + mLatestPublicationDate + "&category=" + mCategory);
         HttpResponse httpResponse = null;
         String str = null;
         try {

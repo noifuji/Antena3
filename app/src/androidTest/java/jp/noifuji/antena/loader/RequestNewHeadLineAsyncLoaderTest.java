@@ -16,12 +16,12 @@ import jp.noifuji.antena.activity.MainActivity;
 /**
  * Created by ryoma on 2015/11/05.
  */
-public class RequestEntryAsyncLoaderTest extends ActivityInstrumentationTestCase2<MainActivity> {
+public class RequestNewHeadLineAsyncLoaderTest extends ActivityInstrumentationTestCase2<MainActivity> {
     private static final String TAG = "RequestEntryALTest";
     private MainActivity mActivity;
     private CountDownLatch mLatch;
 
-    public RequestEntryAsyncLoaderTest() {
+    public RequestNewHeadLineAsyncLoaderTest() {
         super(MainActivity.class);
     }
 
@@ -45,7 +45,7 @@ public class RequestEntryAsyncLoaderTest extends ActivityInstrumentationTestCase
                                     @Override
                                     public Loader<AsyncResult<String>> onCreateLoader(int id, Bundle args) {
                                         Log.d(TAG, "onCreateLoader");
-                                        RequestEntryAsyncLoader loader = new RequestEntryAsyncLoader(mActivity, "0");
+                                        RequestNewHeadLineAsyncLoader loader = new RequestNewHeadLineAsyncLoader(mActivity, "0");
                                         loader.forceLoad();
                                         return loader;
                                     }

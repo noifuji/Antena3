@@ -4,6 +4,7 @@ import android.app.FragmentTransaction;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
@@ -19,12 +20,15 @@ public class WebViewActivity extends AppCompatActivity implements WebViewFragmen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_view);
+        // ツールバーをアクションバーとしてセット
+        Toolbar toolbar = (Toolbar) findViewById(R.id.web_view_tool_bar);
+        setSupportActionBar(toolbar);
 
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        WebViewFragment fragment = new WebViewFragment();
-        transaction.replace(R.id.web_view_fragment, fragment);
-        transaction.commit();
-        mWebViewFragment = fragment;
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            WebViewFragment fragment = new WebViewFragment();
+            transaction.replace(R.id.web_view_fragment, fragment);
+            transaction.commit();
+            mWebViewFragment = fragment;
 
 
     }

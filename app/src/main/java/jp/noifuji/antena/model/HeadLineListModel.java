@@ -12,11 +12,14 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import jp.noifuji.antena.constants.Category;
 import jp.noifuji.antena.entity.HeadLine;
 import jp.noifuji.antena.loader.AsyncResult;
-import jp.noifuji.antena.loader.RequestEntryAsyncLoader;
+import jp.noifuji.antena.loader.RequestNewHeadLineAsyncLoader;
 import jp.noifuji.antena.util.Utils;
 
 /**
@@ -24,14 +27,14 @@ import jp.noifuji.antena.util.Utils;
  */
 public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncResult<String>> {
     private static final String TAG = "HeadLineListModel";
-    private static final String SAVE_FILE_NAME = "history2.dat";
+    private static final String SAVE_FILE_NAME = "history3.dat";
     private static final int LOADER_ID = 0;
     private static final int ENTRY_LIST_LIMIT = 100;
     private Loader mLoader;
     private Context mContext;
     private HeadLineListModelListener mListener;
 
-    private List<HeadLine> mHeadLineList;
+    private Map<String, List<HeadLine>> mCategoryHeadLineListMap;
 
     /**
      * コンストラクタ<br>
@@ -40,10 +43,16 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
      * @param context コンテキスト
      */
     public HeadLineListModel(Context context) {
-        mHeadLineList = (List<HeadLine>) Utils.deserialize(Utils.getSDCardDirectory(context), SAVE_FILE_NAME);
+        mCategoryHeadLineListMap = (Map<String, List<HeadLine>>) Utils.deserialize(Utils.getSDCardDirectory(context), SAVE_FILE_NAME);
 
-        if (mHeadLineList == null) {
-            mHeadLineList = new ArrayList<HeadLine>();
+        if (mCategoryHeadLineListMap == null) {
+            mCategoryHeadLineListMap = new HashMap();
+            mCategoryHeadLineListMap.put(Category.ALL, new ArrayList<HeadLine>());
+            mCategoryHeadLineListMap.put(Category.VIP, new ArrayList<HeadLine>());
+            mCategoryHeadLineListMap.put(Category.SPORTS, new ArrayList<HeadLine>());
+            mCategoryHeadLineListMap.put(Category.NEWS, new ArrayList<HeadLine>());
+            mCategoryHeadLineListMap.put(Category.MONEY, new ArrayList<HeadLine>());
+            mCategoryHeadLineListMap.put(Category.KIJO, new ArrayList<HeadLine>());
         }
     }
 
@@ -51,8 +60,8 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
      * 記事のヘッドラインのリストを取得する。
      * @return
      */
-    public List<HeadLine> getHeadLineList(){
-        return mHeadLineList;
+    public List<HeadLine> getHeadLineList(String category){
+        return mCategoryHeadLineListMap.get(category);
     }
 
     /**
@@ -60,12 +69,12 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
      *     ※リストが日付順に並んでいるという前提をおいている。
      * @return
      */
-    public HeadLine getLatestEntry() {
-        if(mHeadLineList.size() == 0) {
+    public HeadLine getLatestEntry(String category) {
+        if(getHeadLineList(category).size() == 0) {
             return null;
         }
-        HeadLine hl = mHeadLineList.get(mHeadLineList.size()-1);
-        Log.d(TAG, "latest entry's title:" + hl.getmTitle());
+        HeadLine hl = getHeadLineList(category).get(getHeadLineList(category).size()-1);
+        Log.d(TAG, "latest entry's title of " + category + "list :" + hl.getmTitle());
         return hl;
     }
 
@@ -73,15 +82,20 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
      * ヘッドラインリストの情報をサーバーに問い合わせて更新する。
      * @param lm
      */
-    public void update(Context context, LoaderManager lm){
+    public void pullNewHeadLine(Context context, LoaderManager lm){
+        pullNewHeadLine(context, lm, Category.ALL);
+    }
+
+    public void pullNewHeadLine(Context context, LoaderManager lm, String category) {
         this.mContext = context;
         Bundle data = new Bundle();
-        HeadLine hl = getLatestEntry();
+        HeadLine hl = getLatestEntry(category);
         if(hl == null) {
             data.putString("latestPubDate", "0");
         } else {
             data.putString("latestPubDate", hl.getmPublicationDate());
         }
+        data.putString("category", category);
         mLoader = lm.restartLoader(LOADER_ID, data, this);
         mLoader.forceLoad();
     }
@@ -89,7 +103,7 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
     @Override
     public Loader<AsyncResult<String>> onCreateLoader(int i, Bundle bundle) {
         Log.d(TAG, "onCreateLoader");
-        return new RequestEntryAsyncLoader(mContext, bundle.getString("latestPubDate"));
+        return new RequestNewHeadLineAsyncLoader(mContext, bundle.getString("latestPubDate"), bundle.getString("category"));
     }
 
     @Override
@@ -105,16 +119,18 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
 
         String rawJson = data.getData();
         JSONArray jsonEntries = null;
+        String category = "";
         try {
             JSONObject jsonResponse = new JSONObject(rawJson);
             jsonEntries = jsonResponse.getJSONArray("entries");
+            category = jsonResponse.getString("category");
             Log.d(TAG, jsonEntries.length() + " entries received");
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         //すでにリスト内に存在する記事情報のNEWフラグをfalseにしておく
-        for(HeadLine h : mHeadLineList) {
+        for(HeadLine h : getHeadLineList(category)) {
             h.setIsNew(false);
         }
 
@@ -122,10 +138,10 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
             try {
                 JSONObject jsonEntry = jsonEntries.getJSONObject(i);
                 HeadLine headLine = new HeadLine(jsonEntry);
-                Log.d(TAG, "title:" + headLine.getmTitle());
-                mHeadLineList.add(headLine);
-                if (mHeadLineList.size() > ENTRY_LIST_LIMIT) {
-                    mHeadLineList.remove(0);
+                Log.d(TAG, "title:" + headLine.getmTitle() + " , category:" + headLine.getmCategory());
+                getHeadLineList(category).add(headLine);
+                if (getHeadLineList(category).size() > ENTRY_LIST_LIMIT) {
+                    getHeadLineList(category).remove(0);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -133,7 +149,7 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
         }
 
         if(mListener != null) {
-            mListener.onHeadLineListUpdated(mHeadLineList, jsonEntries.length());
+            mListener.onHeadLineListUpdated(getHeadLineList(category), jsonEntries.length());
         }
     }
 
@@ -161,7 +177,7 @@ public class HeadLineListModel implements LoaderManager.LoaderCallbacks<AsyncRes
     }
 
     public void saveHeadLineList(Context context) {
-        Utils.serialize((Serializable) mHeadLineList, Utils.getSDCardDirectory(context), SAVE_FILE_NAME);
+        Utils.serialize((Serializable) mCategoryHeadLineListMap, Utils.getSDCardDirectory(context), SAVE_FILE_NAME);
     }
 
     /**
