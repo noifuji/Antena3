@@ -25,5 +25,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:design:22.2.0'
     compile 'com.github.castorflex.smoothprogressbar:library-circular:1.2.0'
+    compile 'com.github.rahatarmanahmed:circularprogressview:2.4.0'
     androidTestCompile 'junit:junit:4.12'
 }

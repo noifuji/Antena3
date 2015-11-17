@@ -11,6 +11,7 @@
     <color name="ripple">#CCCCCC</color>
     <color name="accent">#333333</color>
     <color name="accent_pressed">#CCCCCC</color>
+    <color name="text">#FFFFFF</color>
 
     <color name="progress_dark">@android:color/holo_blue_light</color>
     <color name="progress_normal">@android:color/holo_blue_bright</color>

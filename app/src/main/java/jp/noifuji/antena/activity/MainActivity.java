@@ -12,11 +12,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import butterknife.Bind;
 import jp.noifuji.antena.R;
 import jp.noifuji.antena.constants.Category;
+import jp.noifuji.antena.entity.HeadLine;
 import jp.noifuji.antena.fragment.HeadLineListFragment;
 
 public class MainActivity extends AppCompatActivity implements HeadLineListFragment.OnFragmentInteractionListener {
@@ -25,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements HeadLineListFragm
     ActionBarDrawerToggle mDrawerToggle;
     @Bind(R.id.drawer_layout)
     DrawerLayout mDrawer;
+    TextView mNewestEntryTitle;
 
     boolean isFragmentChanging = false;
     String mFragmentCategory;
@@ -45,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements HeadLineListFragm
         }
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        mNewestEntryTitle = (TextView) findViewById(R.id.newest_entry_title);
 
         //Setting Navigation View Item Selected Listener to handle the item click of the navigation menu
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -58,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements HeadLineListFragm
                 if (menuItem.isChecked()) menuItem.setChecked(false);
                 else menuItem.setChecked(true);
 
-                ((HeadLineListFragment) getFragmentManager().findFragmentById(R.id.entry_list_fragment)).setViewGone();
+                //((HeadLineListFragment) getFragmentManager().findFragmentById(R.id.entry_list_fragment)).setViewGone();
 
                 //Closing drawer on item click
                 mDrawer.closeDrawers();
@@ -207,6 +211,14 @@ public class MainActivity extends AppCompatActivity implements HeadLineListFragm
         if(getSupportActionBar() != null) {
             getSupportActionBar().setTitle(getResources().getString(resourceId));
         }
+    }
+
+    @Override
+    public void onSetNewestEntryTitle(HeadLine headline) {
+        if(headline == null){
+            return;
+        }
+        mNewestEntryTitle.setText(headline.getmTitle());
     }
 
     @Override

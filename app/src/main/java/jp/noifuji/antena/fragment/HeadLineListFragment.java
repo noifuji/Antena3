@@ -12,11 +12,14 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.github.rahatarmanahmed.cpv.CircularProgressView;
+
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import jp.noifuji.antena.R;
+import jp.noifuji.antena.constants.Category;
 import jp.noifuji.antena.entity.HeadLine;
 import jp.noifuji.antena.model.HeadLineListModel;
 import jp.noifuji.antena.model.ModelFactory;
@@ -41,7 +44,7 @@ public class HeadLineListFragment extends Fragment implements HeadLineListModel.
 
 
     @Bind(R.id.headline_list_progress)
-    View mProgressBar;
+        CircularProgressView mProgressBar;
 
     public HeadLineListFragment() {
         // Required empty public constructor
@@ -88,7 +91,6 @@ public class HeadLineListFragment extends Fragment implements HeadLineListModel.
                 mListView.smoothScrollToPosition(0);
             }
         });
-
         //アップデートする
         mHeadLineListModel.pullNewHeadLine(this.getActivity(), getLoaderManager(), mCategory);
 
@@ -100,7 +102,6 @@ public class HeadLineListFragment extends Fragment implements HeadLineListModel.
         Log.d(TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
         mListener.onSetTitle(mCategory);
-        mProgressBar.setVisibility(View.GONE);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -190,6 +191,11 @@ public class HeadLineListFragment extends Fragment implements HeadLineListModel.
             mListView.setAdapter(adapter);
         }
 
+        //メニューの上に最新エントリの情報を表示する。
+        mListener.onSetNewestEntryTitle(mHeadLineListModel.getLatestEntry(Category.ALL));
+
+        mProgressBar.setVisibility(View.GONE);
+
         //更新ダイアログを停止する。
         mSwipeRefreshLayout.setRefreshing(false);
 
@@ -215,20 +221,8 @@ public class HeadLineListFragment extends Fragment implements HeadLineListModel.
         void onShowTextMessage(String message);
 
         void onSetTitle(String category);
+
+        void onSetNewestEntryTitle(HeadLine headline);
     }
-
-
-    //未実装
-/*    private void updateEntryList(EntryList list) {
-        Date lastUpdate = Utils.getDayInMonth(new Date(Long.valueOf(list.getLatestEntry().getmPublicationDate())));
-        Date now = Utils.getDayInMonth(Utils.getNowDate());
-
-        //エントリーリストが空であれば、最新エントリーを○○件取得する
-        //エントリーリストが空でないが、最終アップデートが過去の日付である場合、リストを空にして○○件取得する
-        //エントリーリストが空でなく、最終アップデートが同じ日付である場合、最終アップデート以降を取得する
-        if (list.size() == 0) {
-
-        }
-    }*/
 
 }

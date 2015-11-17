@@ -3,31 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="190dp"
     android:orientation="vertical"
+    android:background="@color/primary"
     >
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Akash Bangad"
-        android:textSize="14sp"
-        android:textColor="#FFF"
-        android:textStyle="bold"
-        android:gravity="left"
-        android:paddingBottom="4dp"
-        android:id="@+id/username"
-        android:layout_above="@+id/email"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Akash.bangad93@gmail.com"
-        android:id="@+id/email"
+        android:id="@+id/newest_entry_title"
         android:gravity="left"
         android:layout_marginBottom="8dp"
         android:textSize="14sp"
         android:textColor="#fff"
-        android:layout_alignParentBottom="true"
-        android:layout_alignLeft="@+id/username"
-        android:layout_alignStart="@+id/username" />
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

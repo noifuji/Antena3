@@ -1,9 +1,13 @@
 package jp.noifuji.antena.entity;
 
+import java.io.Serializable;
+
 /**
  * Created by Ryoma on 2015/11/09.
  */
-public class HtmlPage {
+public class HtmlPage implements Serializable{
+    private static long serialVersionUID = 4324324325L;
+
     private int mScrollX;
     private int mScrollY;
     private  String mHtml;

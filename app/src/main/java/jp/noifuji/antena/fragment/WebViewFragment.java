@@ -47,15 +47,19 @@ public class WebViewFragment extends Fragment implements EntryModel.EntryModelLi
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
+
+        mHtmlPageStack = new HtmlHistory();
+
         mEntryModel = ModelFactory.getInstance().getmEntryModel();
         mEntryModel.addListener(this);
-        mHtmlPageStack = new HtmlHistory();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_web_view, container, false);
         ButterKnife.bind(this, view);
@@ -71,7 +75,7 @@ public class WebViewFragment extends Fragment implements EntryModel.EntryModelLi
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                mProgressBar.setVisibility(View.GONE);
+                WebViewFragment.this.mProgressBar.setVisibility(View.GONE);
                 if (isGoBack) {
                     //バックキーが押されている場合、ヒストリーからポップする。
                     isGoBack = false;
@@ -108,15 +112,21 @@ public class WebViewFragment extends Fragment implements EntryModel.EntryModelLi
             }
         });
 
-        Intent intent = this.getActivity().getIntent();
-        mEntryModel.loadEntry(this.getActivity(), getLoaderManager(), intent.getStringExtra("URI"));
         mProgressBar.setVisibility(View.VISIBLE);
+        Intent intent = this.getActivity().getIntent();
+        //フラグメントが再生成された場合には、前回表示していたHTMLが残っているため、それを表示する。
+        if (mCurrentHtmlPage == null) {
+            mEntryModel.loadEntry(this.getActivity(), getLoaderManager(), intent.getStringExtra("URI"));
+        } else {
+            webView.loadDataWithBaseURL(null, mCurrentHtmlPage.getmHtml(), "text/html; charset=utf-8", "UTF-8", null);
+        }
 
         return view;
     }
 
     @Override
     public void onAttach(Activity activity) {
+        Log.d(TAG, "onAttach");
         super.onAttach(activity);
         try {
             mListener = (OnFragmentInteractionListener) activity;
@@ -151,14 +161,13 @@ public class WebViewFragment extends Fragment implements EntryModel.EntryModelLi
     @Override
     public void onEntryLoaded(String html, String url) {
         Log.d(TAG, "html length:" + html.length());
-        //webView.loadData(html, "text/html; charset=utf-8", "UTF-8");  buggyらしい
         webView.loadDataWithBaseURL(null, html, "text/html; charset=utf-8", "UTF-8", null);//webviewのhistoryにためない
         mCurrentHtmlPage = new HtmlPage(html);
     }
 
     public void onBackPressed(Activity activity) {
         Log.d(TAG, "onBackPressed mHtmlPageStack = " + mHtmlPageStack.size());
-        if(mHtmlPageStack.size() > 0) {
+        if (mHtmlPageStack.size() > 0) {
             this.isGoBack = true;
             //前ページをロードする
             webView.loadDataWithBaseURL(null, mHtmlPageStack.getLatestHistory().getmHtml(), "text/html; charset=utf-8", "UTF-8", null);
@@ -182,6 +191,7 @@ public class WebViewFragment extends Fragment implements EntryModel.EntryModelLi
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
+
         void onShowTextMessage(String message);
     }
 
